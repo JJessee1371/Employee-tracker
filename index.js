@@ -1,3 +1,23 @@
+const mysql = require('mysql');
+const inquirer = require('inquirer');
+require('dotenv').config();
+const add = require('./JS/add');
+const update = require('./JS/update');
+const view = require('./JS/view');
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    port: 3306,
+    password: process.env.DB_PASS,
+    database: 'employee_tracker_db'
+});
+
+//MVP requirements: 
+//Add departments, roles, and employees
+//View deparments, roles, and employees
+//Update employee roles
+
 function retrieveData() {
     inquirer.prompt([
         {
@@ -47,3 +67,10 @@ function retrieveData() {
         };
     });
 };
+
+retrieveData();
+
+connection.connect((err) => {
+    if(err) throw err;
+    console.log('Connected as id ' + connection.threadId);
+});
