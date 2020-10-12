@@ -1,4 +1,4 @@
-function retrieveData() {
+module.exports = function viewData() {
     inquirer.prompt([
         {
             name: 'choice',
