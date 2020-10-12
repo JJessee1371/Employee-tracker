@@ -20,8 +20,8 @@ const connection = mysql.createConnection({
 function addNew() {
     inquirer.prompt([
         {
-            name: 'Add',
-            type: 'choice',
+            name: 'add',
+            type: 'list',
             choices: [
                 'Add a new department',
                 'Add a new role',
@@ -29,8 +29,44 @@ function addNew() {
             ],
             message: 'What would you like to do? Select from the following:'
         }
-    ]);
+    ])
+    .then((data) => {
+        let choice = data.add;
+        
+        switch(choice) {
+            case 'Add a new department':
+                inquirer.prompt([
+                    {
+                        name: 'department',
+                        type: 'input',
+                        message: 'What is the name of the new department?'
+                    }
+                ])
+                .then((data) => {
+                    connection.query(
+                        'INSERT INTO department SET ?',
+                        {
+                            name: data.department
+                        },
+                        function(err) {
+                            if(err) throw err;
+                        }
+                    );
+                });
+                break;
+
+            case 'Add a new role':
+                break;
+
+            case 'Add a new employee':
+                break;
+        }
+    });
+
+
 };
+
+addNew();
 
 
 connection.connect((err) => {
