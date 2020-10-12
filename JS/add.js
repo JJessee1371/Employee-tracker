@@ -1,23 +1,5 @@
-const mysql = require('mysql');
-const inquirer = require('inquirer');
-require('dotenv').config();
-
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    port: 3306,
-    password: process.env.DB_PASS,
-    database: 'employee_tracker_db'
-});
-
-//MVP requirements: 
-//Add departments, roles, and employees
-//View deparments, roles, and employees
-//Update employee roles
-
-
 //ADD departments, roles, and employees
-function addNew() {
+module.exports = function addNew() {
     inquirer.prompt([
         {
             name: 'add',
@@ -33,6 +15,7 @@ function addNew() {
     .then((data) => {
         let choice = data.add;
         
+        //User is prompted for information based on which table is being added onto
         switch(choice) {
             case 'Add a new department':
                 inquirer.prompt([
@@ -112,10 +95,3 @@ function addNew() {
     });
 };
 
-addNew();
-
-
-connection.connect((err) => {
-    if(err) throw err;
-    console.log('Connected as id ' + connection.threadId);
-});
