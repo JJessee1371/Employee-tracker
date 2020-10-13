@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
+const cTable = require('console.table');
 require('dotenv').config();
 const add = require('./JS/add');
 const update = require('./JS/update');
@@ -18,59 +19,26 @@ const connection = mysql.createConnection({
 //View deparments, roles, and employees
 //Update employee roles
 
-function retrieveData() {
-    inquirer.prompt([
-        {
-            name: 'choice',
-            type: 'list',
-            choices: [
-                'View department',
-                'View roles',
-                'View employees'
-            ],
-            message: 'Please select the action you would like to perform:'
-        }
-    ])
-    .then((data) => {
-        let choice = data.choice;
+// function start() {
+//     inquirer.prompt([
+//         {
+//             name: 'choice',
+//             type: 'list',
+//             choices: [
+                
+//             ]
+//         }
+//     ]);
+// }
 
-        switch(choice) {
-            case 'View department':
-                connection.query(
-                    'SELECT * FROM department',
-                    function(err, res) {
-                        if(err) throw err;
-                        console.log(res);
-                    }
-                );
-                break;
-
-            case 'View roles':
-                connection.query(
-                    'SELECT * FROM role',
-                    function(err, res) {
-                        if(err) throw err;
-                        console.log(res);
-                    }
-                );
-                break;
-
-            case 'View employees':
-                connection.query(
-                    'SELECT * FROM employee',
-                    function(err, res) {
-                        if(err) throw err;
-                        console.log(res);
-                    }
-                );
-                break;
-        };
-    });
-};
-
-retrieveData();
+view.read();
 
 connection.connect((err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
+});
+
+process.on('exit', function(code) {
+    connection.end();
+    return console.log(`About to exit with code ${code}`);
 });
