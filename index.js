@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 require('dotenv').config();
 const add = require('./JS/add');
-const update = require('./JS/update');
-const view = require('./JS/view');
+// const update = require('./JS/update');
+// const view = require('./JS/view');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -31,14 +31,16 @@ const connection = mysql.createConnection({
 //     ]);
 // }
 
-view.read();
+add.create();
 
 connection.connect((err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
 });
 
-process.on('exit', function(code) {
-    connection.end();
-    return console.log(`About to exit with code ${code}`);
-});
+
+
+// process.on('exit', function(code) {
+//     connection.end();
+//     return console.log(`About to exit with code ${code}`);
+// });
