@@ -2,6 +2,9 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 require('dotenv').config();
+const util = require('util');
+var queryPromise;
+var closePromise;
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -20,57 +23,52 @@ module.exports = {
                 name: 'choice',
                 type: 'list',
                 choices: [
-                    'View department',
-                    'View roles',
-                    'View employees'
+                    'View all departments',
+                    'View all roles',
+                    'View all employees'
                 ],
                 message: 'Please select the action you would like to perform:'
             }
         ])
-        .then((data) => {
+        .then(async (data) => {
             let choice = data.choice;
+            let result;
+
+            //let result = await queryPromise('SELECT * FROM role')
+    //console.table(result);
 
             switch(choice) {
-                case 'View department':
-                    connection.query(
-                        'SELECT * FROM department',
-                        function(err, res) {
-                            if(err) throw err;
-                            console.table(res);
-                        }
-                    );
+                case 'View all departments':
+                    result = await queryPromise('SELECT * FROM department');
+                    console.table(result);
                     break;
 
-                case 'View roles':
-                    connection.query(
-                        'SELECT * FROM role',
-                        function(err, res) {
-                            if(err) throw err;
-                            console.table(res);
-                        }
-                    );
+                case 'View all roles':
+                    result = await queryPromise('SELECT * FROM role');
+                    console.table(result);
                     break;
 
-                case 'View employees':
-                    connection.query(
-                        'SELECT * FROM employee',
-                        function(err, res) {
-                            if(err) throw err;
-                            console.table(res);
-                        }
-                    );
+                case 'View all employees':
+                    result = await queryPromise('SELECT * FROM employee');
+                    console.table(result);
                     break;
             };
         });
     }
 };
 
-connection.connect((err) => {
+//function(err, res) {
+//     if(err) throw err;
+//     console.table(res);
+// }
+
+connection.connect(async (err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
+    queryPromise = util.promisify(connection.query).bind(connection);
+    closePromise = util.promisify(connection.end).bind(connection);
 });
 
-process.on('exit', function(code) {
-    connection.end();
-    return console.log(`About to exit with code ${code}`);
+process.on('beforeExit', function() {
+    closePromise();
 });

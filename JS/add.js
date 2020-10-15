@@ -2,9 +2,8 @@ const index = require('../index');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const util = require('util');
-
-var queryPromise  
-var closePromise
+var queryPromise;
+var closePromise;
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -15,7 +14,7 @@ const connection = mysql.createConnection({
 });
 
 //Declare functions to be used to add to tables based on users initial choice
-async function addDept() {
+function addDept() {
     inquirer.prompt([
         {
             name: 'department',
