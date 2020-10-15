@@ -2,9 +2,9 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 require('dotenv').config();
-// const add = require('./JS/add');
+const add = require('./JS/add');
 const alter = require('./JS/update');
-// const view = require('./JS/view');
+const view = require('./JS/view');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -19,19 +19,41 @@ const connection = mysql.createConnection({
 //View deparments, roles, and employees
 //Update employee roles
 
-// function start() {
-//     inquirer.prompt([
-//         {
-//             name: 'choice',
-//             type: 'list',
-//             choices: [
-                
-//             ]
-//         }
-//     ]);
-// }
+function start() {
+    inquirer.prompt([
+        {
+            name: 'choice',
+            type: 'list',
+            choices: [
+                'Add a department, role, or employee',
+                'View departments, roles, or employees',
+                "Update an employees' role",
+                'EXIT'
+            ],
+            message: 'What action would you like to take?'
+        }
+    ]).then((data) => {
+        switch(data.choice) {
+            case 'Add a department, role, or employee':
+                add.create();
+                break;
+            case 'View departments, roles, or employees':
+                view.read();
+                break;
+            case "Update an employees' role":
+                alter.update();
+                break;
+            case 'EXIT':
+                process.end();
+                break;
+        };
+    })
+    .catch((err) => {
+        if(err) console.log(err);
+    });
+};
 
-alter.update();
+start();
 
 connection.connect((err) => {
     if(err) throw err;
