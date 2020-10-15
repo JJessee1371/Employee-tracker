@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-
+//Prompt the user for information on what data they wish to see
 module.exports = {
     read:
     function viewData() {
@@ -45,6 +45,7 @@ module.exports = {
                     console.table(result);
                     break;
 
+                //JOIN for full employee data including role and manager
                 case 'View all employees':
                     result = await queryPromise('SELECT * FROM employee');
                     console.table(result);
@@ -54,9 +55,8 @@ module.exports = {
     }
 };
 
-connection.connect(async (err) => {
+connection.connect((err) => {
     if(err) throw err;
-    console.log('Connected as id ' + connection.threadId);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });
