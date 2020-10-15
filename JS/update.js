@@ -15,6 +15,7 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
+//Prompt the user for the employee information and the new role they will be assigned
 module.exports = {
     update: 
     async function updateRole() {
@@ -46,7 +47,7 @@ module.exports = {
                 let response = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.newrole]);
                     let role_id = response[0].role_id;
                     
-                    let response2 = queryPromise('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
+                    queryPromise('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
                     [role_id, data.first, data.last]);
             })
             .catch((err) => {
@@ -56,9 +57,8 @@ module.exports = {
 };
 
 
-connection.connect(async (err) => {
+connection.connect((err) => {
     if(err) throw err;
-    console.log('Connected as id ' + connection.threadId);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });
