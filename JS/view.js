@@ -34,9 +34,6 @@ module.exports = {
             let choice = data.choice;
             let result;
 
-            //let result = await queryPromise('SELECT * FROM role')
-    //console.table(result);
-
             switch(choice) {
                 case 'View all departments':
                     result = await queryPromise('SELECT * FROM department');
@@ -56,11 +53,6 @@ module.exports = {
         });
     }
 };
-
-//function(err, res) {
-//     if(err) throw err;
-//     console.table(res);
-// }
 
 connection.connect(async (err) => {
     if(err) throw err;
