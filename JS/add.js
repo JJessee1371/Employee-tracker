@@ -210,7 +210,7 @@ connection.connect(async (err) => {
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 
-    let result = await queryPromise('SELECT * FROM role')
+    let result = await queryPromise('SELECT * FROM role');
     console.table(result);
 });
 

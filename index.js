@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 require('dotenv').config();
 // const add = require('./JS/add');
-// const update = require('./JS/update');
-const view = require('./JS/view');
+const alter = require('./JS/update');
+// const view = require('./JS/view');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -31,7 +31,7 @@ const connection = mysql.createConnection({
 //     ]);
 // }
 
-view.read();
+alter.update();
 
 connection.connect((err) => {
     if(err) throw err;
