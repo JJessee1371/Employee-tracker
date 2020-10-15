@@ -1,4 +1,3 @@
-const index = require('../index');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const util = require('util');
@@ -13,7 +12,8 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-//Declare functions to be used to add to tables based on users initial choice
+//Function declarations to be triggered based on the users initial choice
+//Add a department
 function addDept() {
     inquirer.prompt([
         {
@@ -23,7 +23,7 @@ function addDept() {
         }
     ])
     .then(async (data) => {
-        let result = await queryPromise('INSERT INTO department SET ?', {
+        await queryPromise('INSERT INTO department SET ?', {
             name: data.department
         });
     })
@@ -32,14 +32,13 @@ function addDept() {
     });
 };
 
-function addRole() {
-    connection.query('SELECT * FROM department', function(err, res) {
-        if(err) throw err;
+//Add a role
+async function addRole() {
+    let result = await queryPromise('SELECT * FROM department');
         let deptsArr = [];
-        for(i = 0; i < res.length; i++) {
-            deptsArr.push({id: res[i].department_id, name: res[i].name});
+        for(i = 0; i < result.length; i++) {
+            deptsArr.push({id: result[i].department_id, name: result[i].name});
         }
-    
         inquirer.prompt([
             {
                 name: 'title',
@@ -58,110 +57,98 @@ function addRole() {
                 choices: deptsArr
             } 
         ])
-        .then((data) => {
-            connection.query('SELECT department_id FROM department WHERE name = ?', [data.newdept], 
-            (err, result) => {
-                if(err) throw err;
-
-                connection.query(
-                    'INSERT INTO role SET ?',
-                    {
-                        title: data.title,
-                        salary: data.salary,
-                        department_id: result[0].department_id
-                    },
-                    function(err) {
-                        if(err) throw err;
-                    }
-                );
-            });
+        .then(async (data) => {
+            let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
+            [data.newdept]); 
+            
+            await queryPromise('INSERT INTO role SET ?',
+                {
+                    title: data.title,
+                    salary: data.salary,
+                    department_id: response[0].department_id
+                },
+            );
         })
         .catch((err) => {
             if(err) console.log(err);
         });
-    });
 };
 
-function addEmployee() {
-    connection.query('SELECT * FROM role', (err, res) => {
-        if(err) throw err;
-        let roleArr = [];
-        for(i = 0; i < res.length; i++) {
-            roleArr.push({id: res[i].role_id, name: res[i].title})
+//Add an employee
+async function addEmployee() {
+    let result = await queryPromise('SELECT * FROM role');
+    let roleArr = [];
+    for(i = 0; i < result.length; i++) {
+        roleArr.push({id: result[i].role_id, name: result[i].title})
+    }
+
+    inquirer.prompt([
+        {
+            name: 'firstName',
+            type: 'input',
+            message: 'What is the employees first name?'
+        },
+        {
+            name: 'lastName',
+            type: 'input',
+            message: 'What is the employees last name?'
+        },
+        {
+            name: 'role',
+            type: 'list',
+            choices: roleArr,
+            message: "Select the employees' role from the following:"
+        },
+        {
+            name: 'ismanager',
+            type: 'confirm',
+            message: 'Is this person a manager?'
         }
-        console.log(roleArr);
-
-        inquirer.prompt([
-            {
-                name: 'firstName',
-                type: 'input',
-                message: 'What is the employees first name?'
-            },
-            {
-                name: 'lastName',
-                type: 'input',
-                message: 'What is the employees last name?'
-            },
-            {
-                name: 'role',
-                type: 'list',
-                choices: roleArr,
-                message: "Select the employees' role from the following:"
-            },
-            {
-                name: 'ismanager',
-                type: 'confirm',
-                message: 'Is this person a manager?'
-            }
-        ])
-        .then((data) => {
-            connection.query('SELECT role_id FROM role WHERE title = ?', [data.role],
-            (err, result) => {
-                if(err) throw err;
-
-                if(data.ismanager) {
-                    let manager_id = null;
-                } else {
-                    inquirer.prompt([
-                        {
-                            name: 'managerfirst',
-                            type: 'input',
-                            message: "What is the employees' managers' first name?"
-                        },
-                        {
-                            name: 'managerlast',
-                            type: 'input',
-                            message: "What is the employees' managers' last name?"
-                        }
-                    ])
-                    .then((newdata) => {
-                        connection.query('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
-                        [newdata.managerfirst, newdata.managerlast], (err, response) => {
-                            if(err) throw err;
-
-                            manager_id = response[0].employee_id;
-
-                            connection.query(
-                                'INSERT INTO employee SET ?',
-                                {
-                                    first_name: data.firstName,
-                                    last_name: data.lastName,
-                                    role_id: result[0].role_id,
-                                    manager_id: manager_id
-                                },
-                                function(err) {
-                                    if(err) throw err;
-                                }
-                            );
-                        })
-                    })
+    ])
+    .then(async (data) => {
+        //Code block is executed if the employee is not a manager
+        if(!data.ismanager) {
+            let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.role]);
+            inquirer.prompt([
+                {
+                    name: 'managerfirst',
+                    type: 'input',
+                    message: "What is the employees' managers' first name?"
+                },
+                {
+                    name: 'managerlast',
+                    type: 'input',
+                    message: "What is the employees' managers' last name?"
                 }
-            }) 
-        })
-        .catch((err) => {
-            if(err) console.log(err);
-        })
+            ])
+            .then(async (newdata) => {
+                let result3 = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
+                [newdata.managerfirst, newdata.managerlast]);
+                
+                await queryPromise('INSERT INTO employee SET ?',
+                    {
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                        role_id: result2[0].role_id,
+                        manager_id: result3[0].employee_id
+                    }
+                );
+            });
+        //Code executed if the employee is a manager
+        } else {
+            let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.role]);
+            await queryPromise('INSERT INTO employee SET ?',
+                    {
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                        role_id: result2[0].role_id,
+                    }
+                );
+        };
     })
+    .catch((err) => {
+        if(err) console.log(err);
+    });
 };
 
 //ADD departments, roles, and employees
@@ -183,7 +170,7 @@ module.exports = {
         .then((data) => {
             let choice = data.add;
             
-            //User is prompted for information based on which table is being added onto
+            //Users initial choice for which table will be added onto
             switch(choice) {
                 case 'Add a new department':
                     addDept();
@@ -204,14 +191,11 @@ module.exports = {
 };
 
 
-connection.connect(async (err) => {
+connection.connect((err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
-
-    // let result = await queryPromise('SELECT * FROM role');
-    // console.table(result);
 });
 
 process.on('beforeExit', function() {
