@@ -2,6 +2,9 @@ const index = require('../index');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 require('dotenv').config();
+const util = require('util');
+var queryPromise;
+var closePromise;
 
 
 const connection = mysql.createConnection({
@@ -14,12 +17,11 @@ const connection = mysql.createConnection({
 
 module.exports = {
     update: 
-    function updateRole() {
-        connection.query('SELECT title FROM role', (err, res) => {
-            if(err) throw err;
+    async function updateRole() {
+        let result = await queryPromise('SELECT title FROM role');
             let titleArr = []
-            for(i = 0; i < res.length; i++) {
-                titleArr.push(res[i].title);
+            for(i = 0; i < result.length; i++) {
+                titleArr.push(result[i].title);
             };
 
             inquirer.prompt([
@@ -40,26 +42,27 @@ module.exports = {
                     message: "Please select the employees' new role:"
                 }
             ])
-            .then((data) => {
-                connection.query('SELECT role_id FROM role WHERE title = ?', [data.newrole],
-                (err, res) => {
-                    if(err) throw err;
-                    let role_id = res[0].role_id;
+            .then(async (data) => {
+                let response = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.newrole]);
+                    let role_id = response[0].role_id;
                     
-                    connection.query('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
-                    [role_id, data.first, data.last], (err) => {
-                        if(err) throw err;
-                    });
-                });
+                    let response2 = queryPromise('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
+                    [role_id, data.first, data.last]);
             })
             .catch((err) => {
                 if(err) console.log(err);
             });
-        });   
     }
 };
 
-connection.connect((err) => {
+
+connection.connect(async (err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
+    queryPromise = util.promisify(connection.query).bind(connection);
+    closePromise = util.promisify(connection.end).bind(connection);
+});
+
+process.on('beforeExit', function() {
+    closePromise();
 });

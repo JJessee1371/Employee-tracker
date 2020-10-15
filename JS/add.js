@@ -25,7 +25,7 @@ function addDept() {
     .then(async (data) => {
         let result = await queryPromise('INSERT INTO department SET ?', {
             name: data.department
-        })
+        });
     })
     .catch((err) => {
         if(err) console.log(err);
@@ -210,8 +210,8 @@ connection.connect(async (err) => {
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 
-    let result = await queryPromise('SELECT * FROM role');
-    console.table(result);
+    // let result = await queryPromise('SELECT * FROM role');
+    // console.table(result);
 });
 
 process.on('beforeExit', function() {
