@@ -15,6 +15,14 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
+//Inquirer input validation functions
+function noVal(input) {
+    if(!input) {
+        return 'This field cannot be left blank!'
+    }
+    return true
+};
+
 //Prompt the user for the employee information and the new role they will be assigned
 module.exports = {
     update: 
@@ -29,12 +37,14 @@ module.exports = {
                 {
                     name: 'first',
                     type: 'input',
-                    message: "What is the employees' first name?"
+                    message: "What is the employees' first name?",
+                    validate: noVal
                 },
                 {
                     name: 'last',
                     type: 'input',
-                    message: "What is the employees' last name?"
+                    message: "What is the employees' last name?",
+                    validate: noVal
                 },
                 {
                     name: 'newrole',

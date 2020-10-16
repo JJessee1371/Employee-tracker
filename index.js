@@ -14,10 +14,6 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-//MVP requirements: 
-//Add departments, roles, and employees
-//View deparments, roles, and employees
-//Update employee roles
 
 function start() {
     inquirer.prompt([
@@ -51,7 +47,7 @@ function start() {
     .catch((err) => {
         if(err) console.log(err);
     });
-};
+}
 
 start();
 
@@ -59,10 +55,3 @@ connection.connect((err) => {
     if(err) throw err;
     console.log('Connected as id ' + connection.threadId);
 });
-
-
-
-// process.on('exit', function(code) {
-//     connection.end();
-//     return console.log(`About to exit with code ${code}`);
-// });

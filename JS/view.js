@@ -61,6 +61,9 @@ module.exports = {
                     console.table(result);
                     break;
             };
+        })
+        .catch((err) => {
+            if(err) console.log(err);
         });
     }
 };

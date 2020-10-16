@@ -12,6 +12,21 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
+//Inquirer input validation functions
+function noVal(input) {
+    if(!input) {
+        return 'This field cannot be left blank!'
+    }
+    return true
+};
+
+function isNum() {
+    if(isNaN(input)) {
+        return 'This field must be a valid number!'
+    }
+    return true
+};
+
 //Function declarations to be triggered based on the users initial choice
 //Add a department
 function addDept() {
@@ -43,12 +58,14 @@ async function addRole() {
             {
                 name: 'title',
                 type: 'input',
-                message: 'What is the title of the role to be added?'
+                message: 'What is the title of the role to be added?',
+                validate: noVal
             },
             {
                 name: 'salary',
                 type: 'input',
-                message: 'What is the salary for this role?'
+                message: 'What is the salary for this role?',
+                validate: isNum
             },
             {
                 name: 'newdept',
@@ -86,12 +103,14 @@ async function addEmployee() {
         {
             name: 'firstName',
             type: 'input',
-            message: 'What is the employees first name?'
+            message: 'What is the employees first name?',
+            validate: noVal
         },
         {
             name: 'lastName',
             type: 'input',
-            message: 'What is the employees last name?'
+            message: 'What is the employees last name?',
+            validate: noVal
         },
         {
             name: 'role',
@@ -113,12 +132,14 @@ async function addEmployee() {
                 {
                     name: 'managerfirst',
                     type: 'input',
-                    message: "What is the employees' managers' first name?"
+                    message: "What is the employees' managers' first name?",
+                    validate: noVal
                 },
                 {
                     name: 'managerlast',
                     type: 'input',
-                    message: "What is the employees' managers' last name?"
+                    message: "What is the employees' managers' last name?",
+                    validate: noVal
                 }
             ])
             .then(async (newdata) => {
@@ -176,11 +197,9 @@ module.exports = {
                     addDept();
                     break;
 
-
                 case 'Add a new role':
                     addRole();
                     break;
-
 
                 case 'Add a new employee':
                     addEmployee();
