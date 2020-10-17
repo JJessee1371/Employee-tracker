@@ -28,10 +28,11 @@ function start() {
             ],
             message: 'What action would you like to take?'
         }
-    ]).then((data) => {
+    ]).then(async (data) => {
         switch(data.choice) {
             case 'Add a department, role, or employee':
-                add.create();
+                await add.create();
+                start();
                 break;
             case 'View departments, roles, or employees':
                 view.read();
