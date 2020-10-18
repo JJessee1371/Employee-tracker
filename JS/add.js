@@ -20,8 +20,8 @@ function noVal(input) {
     return true
 };
 
-function isNum() {
-    if (isNaN(input)) {
+function isNum(num) {
+    if (isNaN(num)) {
         return 'This field must be a valid number!'
     }
     return true
@@ -38,7 +38,6 @@ async function addDept() {
         }
     ]);
 
-
     await queryPromise('INSERT INTO department SET ?', {
         name: answers.department
     });
@@ -51,7 +50,7 @@ async function addRole() {
     for (i = 0; i < result.length; i++) {
         deptsArr.push({ id: result[i].department_id, name: result[i].name });
     }
-    inquirer.prompt([
+    let answers = await inquirer.prompt([
         {
             name: 'title',
             type: 'input',
@@ -71,21 +70,17 @@ async function addRole() {
             choices: deptsArr
         }
     ])
-        .then(async (data) => {
-            let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
-                [data.newdept]);
 
-            await queryPromise('INSERT INTO role SET ?',
-                {
-                    title: data.title,
-                    salary: data.salary,
-                    department_id: response[0].department_id
-                },
-            );
-        })
-        .catch((err) => {
-            if (err) console.log(err);
-        });
+    let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
+        [answers.newdept]);
+
+    await queryPromise('INSERT INTO role SET ?',
+        {
+            title: answers.title,
+            salary: answers.salary,
+            department_id: response[0].department_id
+        },
+    );
 };
 
 //Add an employee
@@ -96,7 +91,7 @@ async function addEmployee() {
         roleArr.push({ id: result[i].role_id, name: result[i].title })
     }
 
-    inquirer.prompt([
+    let answers = await inquirer.prompt([
         {
             name: 'firstName',
             type: 'input',
@@ -121,55 +116,53 @@ async function addEmployee() {
             message: 'Is this person a manager?'
         }
     ])
-        .then(async (data) => {
-            //Code block is executed if the employee is not a manager
-            if (!data.ismanager) {
-                let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.role]);
-                inquirer.prompt([
-                    {
-                        name: 'managerfirst',
-                        type: 'input',
-                        message: "What is the employees' managers' first name?",
-                        validate: noVal
-                    },
-                    {
-                        name: 'managerlast',
-                        type: 'input',
-                        message: "What is the employees' managers' last name?",
-                        validate: noVal
-                    }
-                ])
-                    .then(async (newdata) => {
-                        let result3 = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
-                            [newdata.managerfirst, newdata.managerlast]);
+        
+    //Code block is executed if the employee is not a manager
+    if (!answers.ismanager) {
+        let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [answers.role]);
+        let answers2 =  await inquirer.prompt([
+            {
+                name: 'managerfirst',
+                type: 'input',
+                message: "What is the employees' managers' first name?",
+                validate: noVal
+            },
+            {
+                name: 'managerlast',
+                type: 'input',
+                message: "What is the employees' managers' last name?",
+                validate: noVal
+            }
+        ])
+            
+        let result3 = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
+            [answers2.managerfirst, answers2.managerlast]);
 
-                        await queryPromise('INSERT INTO employee SET ?',
-                            {
-                                first_name: data.firstName,
-                                last_name: data.lastName,
-                                role_id: result2[0].role_id,
-                                manager_id: result3[0].employee_id
-                            }
-                        );
-                    });
-                //Code executed if the employee is a manager
-            } else {
-                let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.role]);
-                await queryPromise('INSERT INTO employee SET ?',
-                    {
-                        first_name: data.firstName,
-                        last_name: data.lastName,
-                        role_id: result2[0].role_id,
-                    }
-                );
-            };
-        })
-        .catch((err) => {
-            if (err) console.log(err);
-        });
+        await queryPromise('INSERT INTO employee SET ?',
+            {
+                first_name: answers.firstName,
+                last_name: answers.lastName,
+                role_id: result2[0].role_id,
+                manager_id: result3[0].employee_id
+            }
+        );
+   
+        //Code executed if the employee is a manager
+        } else {
+            let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [answers.role]);
+            await queryPromise('INSERT INTO employee SET ?',
+                {
+                    first_name: answers.firstName,
+                    last_name: answers.lastName,
+                    role_id: result2[0].role_id,
+                }
+            );
+        };
+        
 };
 
-//ADD departments, roles, and employees
+
+//ADD departments, roles, and employees exported to index.js
 module.exports = {
     create:
         function addNew() {
@@ -196,11 +189,11 @@ module.exports = {
                                 break;
 
                             case 'Add a new role':
-                                addRole();
+                                await addRole();
                                 break;
 
                             case 'Add a new employee':
-                                addEmployee();
+                                await addEmployee();
                                 break; 
                         };
                         resolve(true)

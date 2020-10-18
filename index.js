@@ -35,10 +35,10 @@ function start() {
                 start();
                 break;
             case 'View departments, roles, or employees':
-                view.read();
+                await view.read();
                 break;
             case "Update an employees' role":
-                alter.update();
+                await alter.update();
                 break;
             case 'EXIT':
                 process.end();
