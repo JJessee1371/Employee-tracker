@@ -34,12 +34,16 @@ function start() {
                 await add.create();
                 start();
                 break;
+
             case 'View departments, roles, or employees':
                 await view.read();
+                start();
                 break;
+
             case "Update an employees' role":
                 await alter.update();
                 break;
+                
             case 'EXIT':
                 process.end();
                 break;

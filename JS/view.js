@@ -17,8 +17,8 @@ const connection = mysql.createConnection({
 //Prompt the user for information on what data they wish to see
 module.exports = {
     read:
-    function viewData() {
-        inquirer.prompt([
+    async function viewData() {  
+        let answers = await inquirer.prompt([
             {
                 name: 'choice',
                 type: 'list',
@@ -30,41 +30,38 @@ module.exports = {
                 message: 'Please select the action you would like to perform:'
             }
         ])
-        .then(async (data) => {
-            let choice = data.choice;
-            let result;
 
-            switch(choice) {
-                case 'View all departments':
-                    result = await queryPromise('SELECT name FROM department');
-                    console.table(result);
-                    break;
+        let choice = answers.choice;
+        let result;
 
-                case 'View all roles':
-                    result = await queryPromise(
-                        `SELECT title, salary, name AS department_name
-                        FROM role AS t1
-                        JOIN department AS t2 ON t1.department_id = t2.department_id
-                        ORDER BY name`
-                    );
-                    console.table(result);
-                    break;
+        switch(choice) {
+            case 'View all departments':
+                result = await queryPromise('SELECT name FROM department');
+                console.table(result);
+                break;
 
-                //JOIN for full employee data including role and manager
-                case 'View all employees':
-                    result = await queryPromise(
-                        `SELECT employee_id, first_name, last_name, manager_id, title, salary, name AS department_name
-                        FROM employee AS t1
-                        JOIN role AS t2 ON t1.role_id = t2.role_id
-                        JOIN department AS t3 ON t2.department_id = t3.department_id`
-                    );
-                    console.table(result);
-                    break;
-            };
-        })
-        .catch((err) => {
-            if(err) console.log(err);
-        });
+            case 'View all roles':
+                result = await queryPromise(
+                    `SELECT title, salary, name AS department_name
+                    FROM role AS t1
+                    JOIN department AS t2 ON t1.department_id = t2.department_id
+                    ORDER BY name`
+                );
+                console.table(result);
+                break;
+
+            //JOIN for full employee data including role and manager
+            case 'View all employees':
+                result = await queryPromise(
+                    `SELECT employee_id, first_name, last_name, manager_id, title, salary, name AS department_name
+                    FROM employee AS t1
+                    JOIN role AS t2 ON t1.role_id = t2.role_id
+                    JOIN department AS t3 ON t2.department_id = t3.department_id`
+                );
+                console.table(result);
+                break;
+        };
+        
     }
 };
 
