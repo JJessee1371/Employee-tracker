@@ -42,8 +42,9 @@ function start() {
 
             case "Update an employees' role":
                 await alter.update();
+                start();
                 break;
-                
+
             case 'EXIT':
                 process.end();
                 break;

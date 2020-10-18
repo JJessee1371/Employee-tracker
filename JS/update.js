@@ -33,7 +33,7 @@ module.exports = {
                 titleArr.push(result[i].title);
             };
 
-            inquirer.prompt([
+            let answers = await inquirer.prompt([
                 {
                     name: 'first',
                     type: 'input',
@@ -52,17 +52,15 @@ module.exports = {
                     choices: titleArr,
                     message: "Please select the employees' new role:"
                 }
-            ])
-            .then(async (data) => {
-                let response = await queryPromise('SELECT role_id FROM role WHERE title = ?', [data.newrole]);
-                    let role_id = response[0].role_id;
-                    
-                    queryPromise('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
-                    [role_id, data.first, data.last]);
-            })
-            .catch((err) => {
-                if(err) console.log(err);
-            });
+            ]);
+            
+            //Get the new role_id 
+            let response = await queryPromise('SELECT role_id FROM role WHERE title = ?', [answers.newrole]);
+             console.log(response[0].role_id);
+            //Update the table with the new information
+            await queryPromise('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?',
+            [response[0].role_id, answers.first, answers.last]);
+            console.log('Role successfully updated!');
     }
 };
 
