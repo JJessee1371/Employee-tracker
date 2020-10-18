@@ -1,16 +1,10 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const util = require('util');
+const connection = require('../index');
 var queryPromise;
 var closePromise;
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    port: 3306,
-    password: process.env.DB_PASS,
-    database: 'employee_tracker_db'
-});
 
 //Inquirer input validation functions
 function noVal(input) {
@@ -42,6 +36,7 @@ async function addDept() {
         name: answers.department
     });
 };
+
 
 //Add a role
 async function addRole() {
@@ -85,6 +80,7 @@ async function addRole() {
         },
     );
 };
+
 
 //Add an employee
 async function addEmployee() {
@@ -205,14 +201,12 @@ module.exports = {
         }
 };
 
-
 connection.connect((err) => {
-    if (err) throw err;
-    console.log('Connected as id ' + connection.threadId);
+    if(err) throw err;
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });
 
-process.on('beforeExit', function () {
+process.on('beforeExit', function() {
     closePromise();
 });

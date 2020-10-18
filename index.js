@@ -59,5 +59,6 @@ start();
 
 connection.connect((err) => {
     if(err) throw err;
-    console.log('Connected as id ' + connection.threadId);
 });
+
+module.exports = connection;
