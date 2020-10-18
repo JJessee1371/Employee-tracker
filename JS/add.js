@@ -22,7 +22,7 @@ function noVal(input) {
 
 function isNum(num) {
     if (isNaN(num)) {
-        return 'This field must be a valid number!'
+        return 'This field must contain a valid number!'
     }
     return true
 };
@@ -48,8 +48,9 @@ async function addRole() {
     let result = await queryPromise('SELECT * FROM department');
     let deptsArr = [];
     for (i = 0; i < result.length; i++) {
-        deptsArr.push({ id: result[i].department_id, name: result[i].name });
+        deptsArr.push({ name: result[i].name });
     }
+
     let answers = await inquirer.prompt([
         {
             name: 'title',
@@ -71,9 +72,11 @@ async function addRole() {
         }
     ])
 
+    //Get the department ID for the new role
     let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
         [answers.newdept]);
 
+    //Insert data to the table based on the users input
     await queryPromise('INSERT INTO role SET ?',
         {
             title: answers.title,
@@ -88,7 +91,7 @@ async function addEmployee() {
     let result = await queryPromise('SELECT * FROM role');
     let roleArr = [];
     for (i = 0; i < result.length; i++) {
-        roleArr.push({ id: result[i].role_id, name: result[i].title })
+        roleArr.push({ name: result[i].title })
     }
 
     let answers = await inquirer.prompt([
@@ -176,29 +179,29 @@ module.exports = {
                             'Add a new role',
                             'Add a new employee'
                         ],
-                        message: 'What would you like to do? Select from the following:'
+                        message: 'Choose which item to add:'
                     }
                 ])
-                    .then(async (data) => {
-                        let choice = data.add;
+                .then(async (data) => {
+                    let choice = data.add;
 
-                        //Users initial choice for which table will be added onto
-                        switch (choice) {
-                            case 'Add a new department':
-                                await addDept();
-                                break;
+                    //Users initial choice for which table will be added onto
+                    switch (choice) {
+                        case 'Add a new department':
+                            await addDept();
+                            break;
 
-                            case 'Add a new role':
-                                await addRole();
-                                break;
+                        case 'Add a new role':
+                            await addRole();
+                            break;
 
-                            case 'Add a new employee':
-                                await addEmployee();
-                                break; 
-                        };
-                        resolve(true)
-                    });
-            })
+                        case 'Add a new employee':
+                            await addEmployee();
+                            break; 
+                    };
+                    resolve(true)
+                });
+            });
         }
 };
 
