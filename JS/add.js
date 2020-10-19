@@ -1,9 +1,16 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const util = require('util');
-const connection = require('../index');
 var queryPromise;
 var closePromise;
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    port: 3306,
+    password: process.env.DB_PASS,
+    database: 'employee_tracker_db'
+});
 
 
 //Inquirer input validation functions
@@ -35,6 +42,7 @@ async function addDept() {
     await queryPromise('INSERT INTO department SET ?', {
         name: answers.department
     });
+    console.log('Department successfully added!');
 };
 
 
@@ -79,6 +87,7 @@ async function addRole() {
             department_id: response[0].department_id
         },
     );
+    console.log('Role successfully added!');
 };
 
 
@@ -145,6 +154,7 @@ async function addEmployee() {
                 manager_id: result3[0].employee_id
             }
         );
+        console.log('Employeed successfully added!');
    
         //Code executed if the employee is a manager
         } else {
@@ -156,6 +166,7 @@ async function addEmployee() {
                     role_id: result2[0].role_id,
                 }
             );
+            console.log('Employeed successfully added!');
         };
         
 };
