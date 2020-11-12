@@ -5,6 +5,7 @@ require('dotenv').config();
 const add = require('./JS/add');
 const alter = require('./JS/update');
 const view = require('./JS/view');
+const del = require('./JS/delete');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -14,7 +15,7 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-
+//Inital prompt to direct the user to the action they want to take
 function start() {
     inquirer.prompt([
         {
@@ -23,6 +24,7 @@ function start() {
             choices: [
                 'Add a department, role, or employee',
                 'View departments, roles, or employees',
+                'Remove a department, role, or employee',
                 "Update an employees' role",
                 'EXIT'
             ],
@@ -37,6 +39,11 @@ function start() {
 
             case 'View departments, roles, or employees':
                 await view.read();
+                start();
+                break;
+
+            case 'Remove a department, role, or employee':
+                await del.remove();
                 start();
                 break;
 
