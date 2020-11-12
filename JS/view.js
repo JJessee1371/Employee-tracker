@@ -25,7 +25,8 @@ module.exports = {
                 choices: [
                     'View all departments',
                     'View all roles',
-                    'View all employees'
+                    'View all employees',
+                    'View employees by manager'
                 ],
                 message: 'Please select the action you would like to perform:'
             }
@@ -60,8 +61,30 @@ module.exports = {
                 );
                 console.table(result);
                 break;
+
+            case 'View employees by manager':
+                let managerName = await inquirer.prompt([
+                    {
+                        name: 'first',
+                        type: 'input',
+                        message: "What is the managers' first name?"
+                    }, 
+                    {
+                        name: 'last',
+                        type: 'input',
+                        message: "What is the managers' last name?"
+                    }
+                ]);
+
+                //Get the employee ID of the manager
+                let id = await queryPromise('SELECT employee_id FROM employee WHERE first_name =? AND last_name = ?',
+                [managerName.first, managerName.last]);
+                //Locate all employees with the retrieved manager ID
+                let employees = await queryPromise ('SELECT * FROM employee WHERE manager_id = ?',
+                [id[0].employee_id]);
+                console.table(employees);
+                break;
         };
-        
     }
 };
 
