@@ -25,7 +25,7 @@ function start() {
                 'Add a department, role, or employee',
                 'View departments, roles, or employees',
                 'Remove a department, role, or employee',
-                "Update an employees' role",
+                "Update an employees' role or manager",
                 'EXIT'
             ],
             message: 'What action would you like to take?'
@@ -47,7 +47,7 @@ function start() {
                 start();
                 break;
 
-            case "Update an employees' role":
+            case "Update an employees' role or manager":
                 await alter.update();
                 start();
                 break;
