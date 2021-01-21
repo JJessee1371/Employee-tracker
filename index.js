@@ -6,6 +6,7 @@ const add = require('./JS/add');
 const alter = require('./JS/update');
 const view = require('./JS/view');
 const del = require('./JS/delete');
+const getBudget = require('./JS/budget');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -26,6 +27,7 @@ function start() {
                 'View departments, roles, or employees',
                 'Remove a department, role, or employee',
                 "Update an employees' role or manager",
+                'View utilized budget for a department',
                 'EXIT'
             ],
             message: 'What action would you like to take?'
@@ -49,6 +51,11 @@ function start() {
 
             case "Update an employees' role or manager":
                 await alter.update();
+                start();
+                break;
+
+            case 'View utilized budget for a department':
+                await getBudget.budget();
                 start();
                 break;
 
