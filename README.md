@@ -1,5 +1,12 @@
 # Employee-tracker
 
+## Table of Contents
+* [Description](#Description)
+* [Video Demonstration](#Video_Demonstration)
+* [Technologies](#Technologies)
+* [Contributing](#Contributing)
+* [License](#License)
+
 ## Description
 A basic content management system that allows a user to build an employee tracker which will hold
 all pertinent information about employees' role, salary, etc. Input is collected via the inquirer
