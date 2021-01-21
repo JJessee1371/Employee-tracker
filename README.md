@@ -10,11 +10,10 @@ delete records that are no longer needed, and see overviews of all the informati
 ## Video Demonstration
 Link [https://drive.google.com/file/d/1Q8bZOeP3Oo494DBkEHeMl4JrsW4SurIn/view?usp=sharing]
 
-## Languages
-* JavaScript
-* MySQL
 
 ## Technologies
+* JavaScript 
+* MySQL
 * Inquirer (https://www.npmjs.com/package/inquirer)
 * MySQL (https://www.npmjs.com/package/mysql)
 * Dotenv (https://www.npmjs.com/package/dotenv)
