@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-//Inital prompt to direct the user to the action they want to take
+//Initial prompt to direct the user to the action they want to take
 function start() {
     inquirer.prompt([
         {
@@ -60,19 +60,19 @@ function start() {
                 break;
 
             case 'EXIT':
-                process.end();
+                connection.end();
                 break;
         };
     })
     .catch((err) => {
         if(err) console.log(err);
     });
-}
+};
 
 start();
 
 connection.connect((err) => {
-    if(err) throw err;
+    if (err) console.log(err.stack);
 });
 
 module.exports = connection;

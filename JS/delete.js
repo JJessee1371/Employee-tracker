@@ -91,7 +91,7 @@ module.exports = {
 };
 
 connection.connect((err) => {
-    if(err) throw err;
+    if (err) console.log(err);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });

@@ -4,15 +4,15 @@
 * [Description](#Description)
 * [Video Demonstration](#Video_Demonstration)
 * [Technologies](#Technologies)
+* [Future Development]($Future_Development)
 * [Contributing](#Contributing)
 * [License](#License)
 
 ## Description
-A basic content management system that allows a user to build an employee tracker which will hold
-all pertinent information about employees' role, salary, etc. Input is collected via the inquirer
-module and then that data is used to manipulate the MySQL database where all of the teams' information
-is stored. Based on what the user chooses to do, they can create new entries, update employee information,
-delete records that are no longer needed, and see overviews of all the information in the database. 
+A basic content management system that allows a user to fill out a team roster that includes the employees' ID number, department, role, salary, etc. 
+Input is collected via the inquirer module and then that data is stored in the MySQL database for later use. Based on what the user chooses to do, 
+they can create new entries, update existing employee information, delete records that are no longer needed, and see overviews of all the information
+in each table of the database or the entirety of the database at once. 
 
 ## Video Demonstration
 Link [https://drive.google.com/file/d/1Q8bZOeP3Oo494DBkEHeMl4JrsW4SurIn/view?usp=sharing]
@@ -25,6 +25,11 @@ Link [https://drive.google.com/file/d/1Q8bZOeP3Oo494DBkEHeMl4JrsW4SurIn/view?usp
 * MySQL (https://www.npmjs.com/package/mysql)
 * Dotenv (https://www.npmjs.com/package/dotenv)
 * Console table
+
+## Future Development
+In the future I would like to convert this application to utilize a connection pool instead of creating and closing a connection on each JS file.
+I would also like to be able to expand the database to hold more employee contact information and other such things that may be useful to team
+managers in their work. 
 
 ## Contributing 
 All contributions to this project are welcomed. Please contact the creator at tjessee7624@gmail.com
