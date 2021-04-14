@@ -20,11 +20,12 @@ module.exports = {
         //Retrieve all department names from the DB for prompt
         let deptsArr = [];
         let depts = await queryPromise('SELECT name FROM department');
-        for(i = 0; i < depts.length; i++) {
-            deptsArr.push(depts[i].name);
-        };
+        console.log(depts);
+        depts.forEach(item => {
+            deptsArr.push(item.name);
+        });
 
-        let answer = await inquirer.prompt([
+        let prompt = await inquirer.prompt([
             {
                 name: 'dept',
                 type: 'list',
@@ -33,18 +34,17 @@ module.exports = {
             }
         ]);
 
-        //Get the department ID based on user answer
+        //Get the department ID based on the user input
         let deptId = await queryPromise('SELECT department_id FROM department WHERE name = ?',
-        [answer.dept]);
+        [prompt.dept]);
 
         //Locate all roles associated with the selected department
         let roles = await queryPromise('SELECT role_id, salary FROM role WHERE department_id = ?',
         [deptId[0].department_id]);
-        
         let rolesArr = [];
-        for(i = 0; i < roles.length; i++) {
-            rolesArr.push(roles[i].role_id);
-        };
+        roles.forEach(item => {
+            rolesArr.push(item.role_id);
+        });
         
         // Search for all employees with the selected role IDs and calculate $ spent
         let budget = 0;
@@ -59,7 +59,7 @@ module.exports = {
 };
 
 connection.connect((err) => {
-    if (err) console.log(err);
+    if(err) console.log(err);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });

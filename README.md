@@ -4,7 +4,7 @@
 * [Description](#Description)
 * [Video Demonstration](#Video_Demonstration)
 * [Technologies](#Technologies)
-* [Future Development]($Future_Development)
+* [Future Development](#Future_Development)
 * [Contributing](#Contributing)
 * [License](#License)
 
@@ -20,16 +20,16 @@ Link [https://drive.google.com/file/d/1Q8bZOeP3Oo494DBkEHeMl4JrsW4SurIn/view?usp
 
 ## Technologies
 * JavaScript 
-* MySQL
-* Inquirer (https://www.npmjs.com/package/inquirer)
 * MySQL (https://www.npmjs.com/package/mysql)
+* Inquirer (https://www.npmjs.com/package/inquirer)
 * Dotenv (https://www.npmjs.com/package/dotenv)
 * Console table
 
 ## Future Development
 In the future I would like to convert this application to utilize a connection pool instead of creating and closing a connection on each JS file.
-I would also like to be able to expand the database to hold more employee contact information and other such things that may be useful to team
-managers in their work. 
+The schema should also be altered to include more employee information that would be pertinent to a work environment like email, phone number, etc. 
+Finally, I would like to include functionality that would update multiple employee records at once since department deletions can affect a large
+number of records and only singular employees can be updated a time currently. 
 
 ## Contributing 
 All contributions to this project are welcomed. Please contact the creator at tjessee7624@gmail.com

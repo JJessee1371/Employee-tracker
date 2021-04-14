@@ -72,8 +72,7 @@ async function addRole() {
     ]);
 
     //Get the department ID for the new role
-    let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
-        [roleDetails.newdept]);
+    let response = await queryPromise('SELECT department_id FROM department WHERE name = ?', [roleDetails.newdept]);
 
     //Insert data to the table based on the users input
     await queryPromise('INSERT INTO role SET ?',

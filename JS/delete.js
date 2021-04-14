@@ -50,10 +50,10 @@ module.exports = {
                     await queryPromise('DELETE FROM role WHERE role_id = ?', [item.role_id]);
                 };
 
-                //Once references in other tables have been deleted, remove the department from the table
+                //Once references in other tables have been deleted, remove the department from the table and return updated data to the user
                 await queryPromise('DELETE FROM department WHERE ?', {name: deptRes.deptName});
                 console.log('Department successfully removed! Here is your updated department list:');
-                updatedDepts = await queryPromise('SELECT name AS Departments FROM department');
+                updatedDepts = await queryPromise('SELECT name AS Departments FROM department ORDER BY name');
                 console.table(updatedDepts);
                 break;
             
@@ -65,6 +65,7 @@ module.exports = {
                         message: 'Which role will be removed?'
                     }
                 ]);
+                
                 //Update all employee records currently in the given role to a null value
                 let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [roleRes.roleName]);
                 await queryPromise('UPDATE employee SET role_id = null WHERE role_id = ?', [roleID[0].role_id]);
