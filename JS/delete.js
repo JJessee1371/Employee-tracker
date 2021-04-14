@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
 
 module.exports = {
     remove:
-    //Choose a table to remove an item from
+    //Choice of which table to remove items from
     async function deleteItems() {
         let toDelete = await inquirer.prompt([
             {
@@ -31,7 +31,6 @@ module.exports = {
             }
         ]);
 
-        let result;
         //Actions triggered based on user choice
         switch(toDelete.choice) {
             case 'Department':
@@ -39,16 +38,22 @@ module.exports = {
                     {
                         name: 'deptName',
                         type: 'input',
-                        message: 'Which department will be removed?'
+                        message: 'Which department will be removed? Note* Associated roles will be removed.'
                     }
                 ]);
 
-                //Delete department and display the updated DB info to the user
-                await queryPromise('DELETE FROM department WHERE ?',
-                {name: deptRes.deptName});
+                //Locate all job titles within the department and remove those titles from the employee and role tables
+                let deptID = await queryPromise('SELECT department_id FROM department WHERE name = ?', [deptRes.deptName]);
+                let associatedRoles = await queryPromise('SELECT role_id FROM role WHERE department_id = ?', [deptID[0].department_id]);
+                for(let item of associatedRoles) {
+                    await queryPromise('UPDATE employee SET role_id = null WHERE role_id = ?', [item.role_id]);
+                    await queryPromise('DELETE FROM role WHERE role_id = ?', [item.role_id]);
+                };
 
+                //Once references in other tables have been deleted, remove the department from the table
+                await queryPromise('DELETE FROM department WHERE ?', {name: deptRes.deptName});
                 console.log('Department successfully removed! Here is your updated department list:');
-                updatedDepts = await queryPromise('SELECT name FROM department');
+                updatedDepts = await queryPromise('SELECT name AS Departments FROM department');
                 console.table(updatedDepts);
                 break;
             
@@ -60,12 +65,15 @@ module.exports = {
                         message: 'Which role will be removed?'
                     }
                 ]);
-                //Delete role and display updated DB into to the user
-                await queryPromise('DELETE FROM role WHERE ?',
-                {title: roleRes.roleName});
-                result = await queryPromise('SELECT * FROM role');
-                console.log('Role successfully removed!');
-                console.table(result);
+                //Update all employee records currently in the given role to a null value
+                let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [roleRes.roleName]);
+                await queryPromise('UPDATE employee SET role_id = null WHERE role_id = ?', [roleID[0].role_id]);
+
+                //Delete role from the table
+                await queryPromise('DELETE FROM role WHERE ?', {title: roleRes.roleName});
+                updatedRoles = await queryPromise('SELECT title AS Roles FROM role');
+                console.log('Role successfully removed! Here is your updated list:');
+                console.table(updatedRoles);
                 break;
 
             case 'Employee':
