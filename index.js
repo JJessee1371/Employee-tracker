@@ -16,11 +16,11 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-//Initial prompt to direct the user to the action they want to take
+//Initial prompt to direct the user to the action they want to take - called recursively
 function start() {
     inquirer.prompt([
         {
-            name: 'choice',
+            name: 'initAction',
             type: 'list',
             choices: [
                 'Add a department, role, or employee',
@@ -33,7 +33,7 @@ function start() {
             message: 'What action would you like to take?'
         }
     ]).then(async (data) => {
-        switch(data.choice) {
+        switch(data.initAction) {
             case 'Add a department, role, or employee':
                 await add.create();
                 start();
@@ -72,7 +72,7 @@ function start() {
 start();
 
 connection.connect((err) => {
-    if (err) console.log(err.stack);
+    if(err) console.log(err.stack);
 });
 
 module.exports = connection;

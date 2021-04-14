@@ -15,23 +15,23 @@ const connection = mysql.createConnection({
 
 //Inquirer input validation functions
 function noVal(input) {
-    if (!input) {
-        return 'This field cannot be left blank!'
+    if(!input) {
+        return 'This field cannot be left blank!';
     }
-    return true
+    return true;
 };
 
 function isNum(num) {
-    if (isNaN(num)) {
-        return 'This field must contain a valid number!'
+    if(isNaN(num)) {
+        return 'This field must contain a valid number!';
     }
-    return true
+    return true;
 };
 
 //Function declarations to be triggered based on the users initial choice
 //Add a department
 async function addDept() {
-    let answers = await inquirer.prompt([
+    let deptDetails = await inquirer.prompt([
         {
             name: 'department',
             type: 'input',
@@ -40,7 +40,7 @@ async function addDept() {
     ]);
 
     await queryPromise('INSERT INTO department SET ?', {
-        name: answers.department
+        name: deptDetails.department
     });
     console.log('Department successfully added!');
 };
@@ -48,13 +48,9 @@ async function addDept() {
 
 //Add a role
 async function addRole() {
-    let result = await queryPromise('SELECT * FROM department');
-    let deptsArr = [];
-    for (i = 0; i < result.length; i++) {
-        deptsArr.push({ name: result[i].name });
-    }
+    let departments = await queryPromise('SELECT name FROM department');
 
-    let answers = await inquirer.prompt([
+    let roleDetails = await inquirer.prompt([
         {
             name: 'title',
             type: 'input',
@@ -71,19 +67,19 @@ async function addRole() {
             name: 'newdept',
             type: 'list',
             message: 'What deparmtent will this role belong to?',
-            choices: deptsArr
+            choices: departments
         }
-    ])
+    ]);
 
     //Get the department ID for the new role
     let response = await queryPromise('SELECT department_id FROM department WHERE name = ?',
-        [answers.newdept]);
+        [roleDetails.newdept]);
 
     //Insert data to the table based on the users input
     await queryPromise('INSERT INTO role SET ?',
         {
-            title: answers.title,
-            salary: answers.salary,
+            title: roleDetails.title,
+            salary: roleDetails.salary,
             department_id: response[0].department_id
         },
     );
@@ -93,42 +89,42 @@ async function addRole() {
 
 //Add an employee
 async function addEmployee() {
-    let result = await queryPromise('SELECT * FROM role');
-    let roleArr = [];
-    for (i = 0; i < result.length; i++) {
-        roleArr.push({ name: result[i].title })
-    }
+    let roles = await queryPromise('SELECT title FROM role');
+    let rolesArr = [];
+    roles.forEach(item => {
+        rolesArr.push(item.title);
+    });
 
-    let answers = await inquirer.prompt([
+    let employeeDetails = await inquirer.prompt([
         {
             name: 'firstName',
             type: 'input',
-            message: 'What is the employees first name?',
+            message: 'What is the employees\' first name?',
             validate: noVal
         },
         {
             name: 'lastName',
             type: 'input',
-            message: 'What is the employees last name?',
+            message: 'What is the employees\' last name?',
             validate: noVal
         },
         {
             name: 'role',
             type: 'list',
-            choices: roleArr,
-            message: "Select the employees' role from the following:"
+            message: 'Select the employees\' role from the following:',
+            choices: rolesArr
         },
         {
             name: 'ismanager',
             type: 'confirm',
             message: 'Is this person a manager?'
         }
-    ])
+    ]);
         
     //Code block is executed if the employee is not a manager
-    if (!answers.ismanager) {
-        let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [answers.role]);
-        let answers2 =  await inquirer.prompt([
+    if(!employeeDetails.ismanager) {
+        let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [employeeDetails.role]);
+        let managerInfo = await inquirer.prompt([
             {
                 name: 'managerfirst',
                 type: 'input',
@@ -143,32 +139,31 @@ async function addEmployee() {
             }
         ])
             
-        let result3 = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
-            [answers2.managerfirst, answers2.managerlast]);
+        let managerID = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
+            [managerInfo.managerfirst, managerInfo.managerlast]);
 
         await queryPromise('INSERT INTO employee SET ?',
             {
-                first_name: answers.firstName,
-                last_name: answers.lastName,
-                role_id: result2[0].role_id,
-                manager_id: result3[0].employee_id
+                first_name: employeeDetails.firstName,
+                last_name: employeeDetails.lastName,
+                role_id: roleID[0].role_id,
+                manager_id: managerID[0].employee_id
             }
         );
         console.log('Employeed successfully added!');
    
         //Code executed if the employee is a manager
         } else {
-            let result2 = await queryPromise('SELECT role_id FROM role WHERE title = ?', [answers.role]);
+            let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [employeeDetails.role]);
             await queryPromise('INSERT INTO employee SET ?',
                 {
-                    first_name: answers.firstName,
-                    last_name: answers.lastName,
-                    role_id: result2[0].role_id,
+                    first_name: employeeDetails.firstName,
+                    last_name: employeeDetails.lastName,
+                    role_id: roleID[0].role_id,
                 }
             );
             console.log('Employeed successfully added!');
-        };
-        
+        }; 
 };
 
 
