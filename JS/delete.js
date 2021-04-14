@@ -18,7 +18,7 @@ module.exports = {
     remove:
     //Choose a table to remove an item from
     async function deleteItems() {
-        let answer = await inquirer.prompt([
+        let toDelete = await inquirer.prompt([
             {
                 name: 'choice',
                 type: 'list',
@@ -33,7 +33,7 @@ module.exports = {
 
         let result;
         //Actions triggered based on user choice
-        switch(answer.choice) {
+        switch(toDelete.choice) {
             case 'Department':
                 let deptRes = await inquirer.prompt([
                     {
@@ -42,12 +42,14 @@ module.exports = {
                         message: 'Which department will be removed?'
                     }
                 ]);
+
                 //Delete department and display the updated DB info to the user
                 await queryPromise('DELETE FROM department WHERE ?',
                 {name: deptRes.deptName});
-                result = await queryPromise('SELECT * FROM department');
-                console.log('Department successfully removed!');
-                console.table(result);
+
+                console.log('Department successfully removed! Here is your updated department list:');
+                updatedDepts = await queryPromise('SELECT name FROM department');
+                console.table(updatedDepts);
                 break;
             
             case 'Role':
@@ -71,27 +73,28 @@ module.exports = {
                     {
                         name: 'employeeF',
                         type: 'input',
-                        message: "What is the employees' first name?"
+                        message: 'What is the employees\' first name?'
                     },
                     {
                         name: 'employeeL',
                         type: 'input',
-                        message: "What is the employees' last name?"
+                        message: 'What is the employees\' last name?'
                     }
                 ]);
-                //Delete employee and display updated DB info to the user
+
+                //Delete employee and display updated employee list to the user
                 await queryPromise('DELETE FROM employee WHERE ? AND ?',
                 [{first_name: employeeRes.employeeF}, {last_name: employeeRes.employeeL}]);
-                result = await queryPromise('SELECT * FROM employee');
-                console.log('Employee successfully removed!');
-                console.table(result);
+                updatedEmployees = await queryPromise('SELECT employee_id AS ID, first_name AS First, last_name AS Last FROM employee ORDER BY Last');
+                console.log('Employee successfully removed! Here is your updated employe list:');
+                console.table(updatedEmployees);
                 break;
         };
     }
 };
 
 connection.connect((err) => {
-    if (err) console.log(err);
+    if(err) console.log(err);
     queryPromise = util.promisify(connection.query).bind(connection);
     closePromise = util.promisify(connection.end).bind(connection);
 });
