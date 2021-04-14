@@ -24,15 +24,15 @@ function start() {
             type: 'list',
             choices: [
                 'Add a department, role, or employee',
+                'Update an employees\' information',
                 'View departments, roles, or employees',
                 'Remove a department, role, or employee',
-                "Update an employees' role or manager",
                 'View utilized budget for a department',
                 'EXIT'
             ],
             message: 'What action would you like to take?'
         }
-    ]).then(async (data) => {
+    ]).then(async(data) => {
         switch(data.initAction) {
             case 'Add a department, role, or employee':
                 await add.create();
@@ -49,7 +49,7 @@ function start() {
                 start();
                 break;
 
-            case "Update an employees' role or manager":
+            case 'Update an employees\' information':
                 await alter.update();
                 start();
                 break;

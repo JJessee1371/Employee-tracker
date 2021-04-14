@@ -184,7 +184,7 @@ module.exports = {
                         message: 'Choose which item to add:'
                     }
                 ])
-                .then(async (data) => {
+                .then(async(data) => {
                     let choice = data.add;
 
                     //Users initial choice for which table will be added onto
