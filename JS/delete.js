@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const { checkValue } = require('./validate');
 require('dotenv').config();
 const util = require('util');
 var queryPromise;
@@ -38,7 +39,8 @@ module.exports = {
                     {
                         name: 'deptName',
                         type: 'input',
-                        message: 'Which department will be removed? Note* Associated roles will be removed.'
+                        message: 'Which department will be removed? Note* Associated roles will be removed.',
+                        validate: checkValue
                     }
                 ]);
 
@@ -62,7 +64,8 @@ module.exports = {
                     {
                         name: 'roleName',
                         type: 'input',
-                        message: 'Which role will be removed?'
+                        message: 'Which role will be removed?',
+                        validate: checkValue
                     }
                 ]);
                 
@@ -82,12 +85,14 @@ module.exports = {
                     {
                         name: 'employeeF',
                         type: 'input',
-                        message: 'What is the employees\' first name?'
+                        message: 'What is the employees\' first name?',
+                        validate: checkValue
                     },
                     {
                         name: 'employeeL',
                         type: 'input',
-                        message: 'What is the employees\' last name?'
+                        message: 'What is the employees\' last name?',
+                        validate: checkValue
                     }
                 ]);
 

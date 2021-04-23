@@ -17,30 +17,24 @@ const connection = mysql.createConnection({
 module.exports = {
     budget:
     async function getBudget() {
-        //Retrieve all department names from the DB for prompt
-        let deptsArr = [];
         let depts = await queryPromise('SELECT name FROM department');
-        console.log(depts);
-        depts.forEach(item => {
-            deptsArr.push(item.name);
-        });
 
         let prompt = await inquirer.prompt([
             {
                 name: 'dept',
                 type: 'list',
-                choices: deptsArr,
+                choices: depts.map(item => {
+                    return item.name;
+                }),
                 message: 'Which department should budget be calculated for?'
             }
         ]);
 
         //Get the department ID based on the user input
-        let deptId = await queryPromise('SELECT department_id FROM department WHERE name = ?',
-        [prompt.dept]);
+        let deptId = await queryPromise('SELECT department_id FROM department WHERE ?', {name: prompt.dept});
 
         //Locate all roles associated with the selected department
-        let roles = await queryPromise('SELECT role_id, salary FROM role WHERE department_id = ?',
-        [deptId[0].department_id]);
+        let roles = await queryPromise('SELECT role_id, salary FROM role WHERE ?', {department_id : deptId[0].department_id});
         let rolesArr = [];
         roles.forEach(item => {
             rolesArr.push(item.role_id);
@@ -49,11 +43,9 @@ module.exports = {
         // Search for all employees with the selected role IDs and calculate $ spent
         let budget = 0;
         for(i = 0; i < rolesArr.length; i++) {
-            let employees = await queryPromise('SELECT employee_id FROM employee WHERE role_id = ?',
-            [rolesArr[i]]);
+            let employees = await queryPromise('SELECT employee_id FROM employee WHERE ?', {role_id: rolesArr[i]});
             budget += (employees.length * roles[i].salary);
         };
-
         console.log(`The utilized budget for the department is $${budget}`);
     }
 };

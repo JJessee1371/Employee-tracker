@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const util = require('util');
+const { checkValue, checkNumber } = require('./validate');
 var queryPromise;
 var closePromise;
 
@@ -13,21 +14,6 @@ const connection = mysql.createConnection({
 });
 
 
-//Inquirer input validation functions
-function noVal(input) {
-    if(!input) {
-        return 'This field cannot be left blank!';
-    }
-    return true;
-};
-
-function isNum(num) {
-    if(isNaN(num)) {
-        return 'This field must contain a valid number!';
-    }
-    return true;
-};
-
 //Function declarations to be triggered based on the users initial choice
 //Add a department
 async function addDept() {
@@ -35,7 +21,8 @@ async function addDept() {
         {
             name: 'department',
             type: 'input',
-            message: 'What is the name of the new department?'
+            message: 'What is the name of the new department?',
+            validate: checkValue
         }
     ]);
 
@@ -55,13 +42,13 @@ async function addRole() {
             name: 'title',
             type: 'input',
             message: 'What is the title of the role to be added?',
-            validate: noVal
+            validate: checkValue
         },
         {
             name: 'salary',
             type: 'input',
             message: 'What is the salary for this role?',
-            validate: isNum
+            validate: checkNumber
         },
         {
             name: 'newdept',
@@ -89,29 +76,27 @@ async function addRole() {
 //Add an employee
 async function addEmployee() {
     let roles = await queryPromise('SELECT title FROM role');
-    let rolesArr = [];
-    roles.forEach(item => {
-        rolesArr.push(item.title);
-    });
 
     let employeeDetails = await inquirer.prompt([
         {
             name: 'firstName',
             type: 'input',
             message: 'What is the employees\' first name?',
-            validate: noVal
+            validate: checkValue
         },
         {
             name: 'lastName',
             type: 'input',
             message: 'What is the employees\' last name?',
-            validate: noVal
+            validate: checkValue
         },
         {
             name: 'role',
             type: 'list',
             message: 'Select the employees\' role from the following:',
-            choices: rolesArr
+            choices: roles.map(item => {
+                return item.title;
+            })
         },
         {
             name: 'ismanager',
@@ -122,25 +107,24 @@ async function addEmployee() {
         
     //Code block is executed if the employee is not a manager
     if(!employeeDetails.ismanager) {
-        let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [employeeDetails.role]);
+        let roleID = await queryPromise('SELECT role_id FROM role WHERE ?', {title: employeeDetails.role});
         let managerInfo = await inquirer.prompt([
             {
                 name: 'managerfirst',
                 type: 'input',
                 message: "What is the employees' managers' first name?",
-                validate: noVal
+                validate: checkValue
             },
             {
                 name: 'managerlast',
                 type: 'input',
                 message: "What is the employees' managers' last name?",
-                validate: noVal
+                validate: checkValue
             }
-        ])
+        ]);
             
         let managerID = await queryPromise('SELECT employee_id FROM employee WHERE first_name = ? AND last_name =?',
             [managerInfo.managerfirst, managerInfo.managerlast]);
-
         await queryPromise('INSERT INTO employee SET ?',
             {
                 first_name: employeeDetails.firstName,
@@ -150,10 +134,9 @@ async function addEmployee() {
             }
         );
         console.log('Employeed successfully added!');
-   
         //Code executed if the employee is a manager
         } else {
-            let roleID = await queryPromise('SELECT role_id FROM role WHERE title = ?', [employeeDetails.role]);
+            let roleID = await queryPromise('SELECT role_id FROM role WHERE ?', {title: employeeDetails.role});
             await queryPromise('INSERT INTO employee SET ?',
                 {
                     first_name: employeeDetails.firstName,
@@ -200,7 +183,7 @@ module.exports = {
                             await addEmployee();
                             break; 
                     };
-                    resolve(true)
+                    resolve(true);
                 });
             });
         }

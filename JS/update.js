@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql');
 require('dotenv').config();
 const util = require('util');
+const { checkValue } = require('./validate');
 var queryPromise;
 var closePromise;
 
@@ -13,13 +14,6 @@ const connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-//Inquirer input validation functions
-function noVal(input) {
-    if(!input) {
-        return 'This field cannot be left blank!';
-    }
-    return true;
-};
 
 module.exports = {
     update: 
@@ -42,28 +36,26 @@ module.exports = {
             //Gather info to locate the employee and include their new role
             case 'Role':
                 let result = await queryPromise('SELECT title FROM role');
-                let titleArr = [];
-                result.forEach(item => {
-                    titleArr.push(item.title)
-                });
 
                 let roleAnswers = await inquirer.prompt([
                     {
                         name: 'first',
                         type: 'input',
                         message: 'What is the employees\' first name?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'last',
                         type: 'input',
                         message: 'What is the employees\' last name?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'newrole',
                         type: 'list',
-                        choices: titleArr,
+                        choices: result.map(item => {
+                            return item.title
+                        }),
                         message: 'Please select the employees\' new role:'
                     }
                 ]);
@@ -92,23 +84,25 @@ module.exports = {
                         name: 'first',
                         type: 'input',
                         message: 'What is the employees\' first name?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'last',
                         type: 'input',
                         message: 'What is the employees\' last name?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'managerF',
                         type: 'input',
-                        message: 'What is the new managers\' first name?'
+                        message: 'What is the new managers\' first name?',
+                        validate: checkValue
                     },
                     {
                         name: 'managerL',
                         type: 'input',
-                        message: 'What is the managers\' last name?'
+                        message: 'What is the managers\' last name?',
+                        validate: checkValue
                     }
                 ]);
 
@@ -137,23 +131,25 @@ module.exports = {
                         name: 'currentFirst',
                         type: 'input',
                         message: 'What is the first name currently on record?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'currentLast',
                         type: 'input',
                         message: 'What is the last name currently on record?',
-                        validate: noVal
+                        validate: checkValue
                     },
                     {
                         name: 'newFirst',
                         type: 'input',
-                        message: 'Enter the employee\s desired first name:'
+                        message: 'Enter the employee\s desired first name:',
+                        validate: checkValue
                     }, 
                     {
                         name: 'newLast',
                         type: 'input',
-                        message: 'Enter the employee\s desired last name:'
+                        message: 'Enter the employee\s desired last name:',
+                        validate: checkValue
                     }
                 ]);
 
